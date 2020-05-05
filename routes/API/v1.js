@@ -1,9 +1,18 @@
+/**
+ * Métodos del API
+ * @see https://expressjs.com/es/api.html
+ * @see https://expressjs.com/en/resources/middleware/cors.html
+ * @see http://expressjs.com/en/api.html#res.json
+ * @see https://mongoosejs.com/docs/guide.html
+ */
+
+// Dependencias
 var express = require('express');
 var cors = require('cors');
 var router = express.Router();
 router.use(cors());
 
-// MongoDB
+// Lectura de las dependencias y variables de MongoDB
 const dbConf = require('../../db_conf');
 const mongoose = require('mongoose');
 const {
@@ -14,6 +23,12 @@ const {
     ObjectID
 } = require('mongodb');
 
+/**
+ * Método get para la ruta raíz /
+ * @param  {Request} req
+ * @param  {Response} res
+ * @return Json API version 
+ */
 router.get('/', (req, res) => {
     res.json({
         api_version: 1.0,
@@ -21,12 +36,16 @@ router.get('/', (req, res) => {
     });
 });
 
-//lista de dependencias
 /**
- * Get
+ * Método get para obtener el listado de dependencias participantes
+ * @param  {Request} req
+ * @param  {Response} res
+ * @return Json
  */
 router.get('/spic/dependencias', (req, res) => {
+    // conexión a la base de datos
     MongoClient.connect(dbConf.url, dbConf.client_options).then(client => {
+
         const db = client.db();
         const spic = db.collection('spic');
 
@@ -43,21 +62,21 @@ router.get('/spic/dependencias', (req, res) => {
                 res.json({
                     code: "022",
                     message: "fail group"
-                })
+                });
             }
 
             res.json(
                 docs.map(d => {
                     return d._id;
                 })
-            )
+            );
         });
 
     }).catch(err => {
         res.json({
             code: "021",
             message: "fail database"
-        })
+        });
         console.log(err);
     });
 });
@@ -65,6 +84,9 @@ router.get('/spic/dependencias', (req, res) => {
 // api consulta
 /**
  * Post
+ * @param  {Request} req
+ * @param  {Response} res
+ * @return Json
  */
 router.post('/spic', (req, res) => {
     const {
@@ -192,6 +214,9 @@ router.post('/spic', (req, res) => {
 // create
 /**
  * Post 
+ * @param  {Request} req
+ * @param  {Response} res
+ * @return Json
  */
 router.post('/spic/create', (req, res) => {
     mongoose.connect(dbConf.url, dbConf.client_options);
@@ -215,6 +240,9 @@ router.post('/spic/create', (req, res) => {
 // find by id and update
 /**
  * Put
+ * @param  {Request} req
+ * @param  {Response} res
+ * @return Json
  */
 router.put('/spic', (req, res) => {
     const {
@@ -238,6 +266,9 @@ router.put('/spic', (req, res) => {
 // find by id and delete
 /**
  * Delete 
+ * @param  {Request} req
+ * @param  {Response} res
+ * @return Json
  */
 router.delete('/spic', (req, res) => {
     const {
@@ -252,7 +283,7 @@ router.delete('/spic', (req, res) => {
         res.status(500).json(error);
         mongoose.disconnect();
     })
-    
+
 });
 
 module.exports = router; // Permitirá que nuestro módulo de api se use en otros módulos
